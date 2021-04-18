@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\DeviceRecordController;
+use App\Http\Controllers\GuardianController;
+use App\Http\Controllers\InitializeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\StudentController;
 use App\Models\DeviceRecord;
+use App\Models\Guardian;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,11 +23,26 @@ use App\Models\DeviceRecord;
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', [StudentController::class, 'home'])->name('school.home');
     Route::get('/parents', [StudentController::class, 'parents'])->name('school.parents');
-    Route::get('/reports', [StudentController::class, 'reports'])->name('school.reports');
-    Route::get('/send/sms', [StudentController::class, 'send_sms'])->name('school.send.sms');
+    Route::get('/reports/{class}/{stream}', [StudentController::class, 'reports'])->name('school.reports');
+    Route::get('/bulk_sms/{class}/{stream}', [StudentController::class, 'bulk_sms'])->name('school.bulkSms');
+    Route::post('/send_bulk_sms', [StudentController::class, 'send_bulk_sms'])->name('school.send_bulk_sms');
+    Route::post('/reports/poster', [StudentController::class, 'reportsPoster'])->name('school.reports.poster');
+    Route::post('/students/poster', [StudentController::class, 'studentsPoster'])->name('school.students.poster');
     Route::get('/reports/sms', [StudentController::class, 'reports_sms'])->name('school.reports.sms');
     Route::get('/streams', [StudentController::class, 'streams'])->name('school.streams');
-    Route::get('/class/{class_name}/{stream_id}', [StudentController::class, 'class'])->name('school.class.data');
+    Route::post('/streams/new', [StudentController::class, 'streamsNew'])->name('new.streams');
+    Route::post('/streams/update', [StudentController::class, 'streamsUpdate'])->name('update.streams');
+    Route::get('/class/{class_name}/{stream_id}', [StudentController::class, 'myClass'])->name('school.class.data');
+    Route::post('/parents/new', [StudentController::class, 'newParent'])->name('school.new.parent');
+    Route::post('/student/new', [StudentController::class, 'newStudent'])->name('school.new.student');
+    Route::post('/student/update', [StudentController::class, 'updateStudent'])->name('school.update.student');
+    Route::get('/parents', [StudentController::class, 'getParents'])->name('school.parents');
+    Route::get('/parent/delete/{parent_id}', [GuardianController::class, 'delete'])->name('guardian.delete');
+    Route::get('/student/delete/{student_id}', [StudentController::class, 'delete'])->name('student.delete');
+    Route::post('/parent/sms/new', [GuardianController::class, 'newSms'])->name('school.send.sms');
+    Route::get('/initialize', [InitializeController::class, 'initialize'])->name('school.initialize');
+    Route::get('/templetes', [StudentController::class, 'templetes'])->name('sms.templete');
+    Route::post('/templetesUpdate', [StudentController::class, 'templetesUpdate'])->name('sms.templetesUpdate');
 });
 
 Route::get('/', function () {

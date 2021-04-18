@@ -14,4 +14,14 @@ class Student extends Model
     {
         return $this->hasMany(Guardian::class);
     }
+
+    public function getStream()
+    {
+        return $this->hasOne(Stream::class,'id','stream');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

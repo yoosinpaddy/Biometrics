@@ -9,4 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FaceRecord extends Model
 {
     use HasFactory,SoftDeletes;
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class,'upi_no','upi_no');
+    }
 }

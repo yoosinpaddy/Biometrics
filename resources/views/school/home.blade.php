@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="./plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="./plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="./dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="./dist/css/adminlte.min.css"><!-- Toastr -->
+    <link rel="stylesheet" href="./plugins/toastr/toastr.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -42,6 +43,22 @@
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"></h3>
+                            <div class="project-actions text-right">
+                                <a class="btn btn-primary btn-sm" href="#" data-toggle="modal"
+                                    data-target="#modal-addStudent">
+                                    <i class="fas fa-plus">
+                                    </i>
+                                    NEW STUDENT
+                                </a>
+                            </div>
+                            @if ($errors->any())
+                                <p class="text-danger">{{ $errors->first() }}</p>
+                            @endif
+                        </div>
+                    </div>
                 </div><!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
@@ -176,6 +193,119 @@
                         <!-- right col -->
                     </div>
                     <!-- /.row (main row) -->
+                <div class="modal fade" id="modal-addStudent">
+                    <div class="modal-dialog modal-xl">
+                        <form id="newParentForm" action="{{ route('school.new.student') }}" method='POST'
+                            enctype="multipart/form-data">
+                            <div class="modal-content">
+                                <div id="progressBar" class=" d-flex justify-content-center align-items-center">
+
+                                </div>
+                                <div class="modal-header">
+                                    <h4 class="modal-title">New Student</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <section class="content">
+                                        <div class="row">
+                                            <div class="col-md-12" id="generalCol">
+                                                <div class="card card-primary">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Info</h3>
+
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-tool"
+                                                                data-card-widget="collapse" title="Collapse">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        @if ($errors->any())
+                                                            <div class="alert alert-danger">
+                                                                <ul>
+                                                                    @foreach ($errors->all() as $error)
+                                                                        <li>{{ $error }}</li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @endif
+                                                        {!! csrf_field() !!}
+                                                        <div class="form-group">
+                                                            <label for="fname">Student first name</label>
+                                                            <input required="" type="text" name="fname"
+                                                                placeholder="First name" id="fname" class="form-control"
+                                                                value="">
+                                                            <input id="newOrderId" type="hidden" name="newOrderId"
+                                                                placeholder="Student first name" class="form-control"
+                                                                value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="surname">Student Surname</label>
+                                                            <input required="" type="text" name="surname"
+                                                                placeholder="Student Surname" id="surname"
+                                                                class="form-control" value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="phone">Student middle name(optional)</label>
+                                                            <input type="text" name="middle_name"
+                                                                placeholder="Student middle name(optional)" id="phone"
+                                                                class="form-control" value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="upi">Student UPI No.</label>
+                                                            <input required="" type="text" name="upi_no"
+                                                                placeholder="Student  UPI No." id="upi"
+                                                                class="form-control" value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="upi">Class/Grade</label>
+                                                            <input required="" type="number" name="class"
+                                                                placeholder="Class/Grade" id="upi"
+                                                                class="form-control" value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="student_id">Stream</label>
+                                                            <select required="" name="stream" id="student_id"
+                                                                class="form-control custom-select">
+                                                                @if (count($streams)==0)
+                                                                <option value="">Go to <a href="{{route('school.streams')}}">Stream setup</a> to add stream</option>
+
+                                                                @else
+                                                                    <option value="">Select one</option>
+                                                                @endif
+                                                                @foreach ($streams as $stream)
+                                                                    <option value="{{ $stream->id }}">
+                                                                        {{ $stream->name}}
+                                                                    </option>
+
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+                                                    <!-- /.card-body -->
+                                                </div>
+                                                <!-- /.card -->
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="modal-footer justify-content-between">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </form>
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
                 </div><!-- /.container-fluid -->
             </section>
             <!-- /.content -->
@@ -209,6 +339,8 @@
     <script src="./plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="./plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- Page specific script -->
+    <!-- Toastr -->
+    <script src="./plugins/toastr/toastr.min.js"></script>
     <script>
         $(function() {
             $("#nameList").DataTable({
@@ -295,11 +427,13 @@
 
 
         window.onload = function() {
-            // initiate();
-            setInterval(function() {
-                // initiate();
-            }, 5000);
+            @if (\Session::has('success'))
+                toastr.success("{{ \Session::get('success') }}");
+            @elseif (\Session::has('message'))
+                toastr.error("{{ \Session::get('message') }}");
+            @endif
         }
+
 
     </script>
 </body>

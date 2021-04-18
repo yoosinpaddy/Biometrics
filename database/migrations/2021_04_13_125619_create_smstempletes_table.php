@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFaceRecordsTable extends Migration
+class CreateSmstempletesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateFaceRecordsTable extends Migration
      */
     public function up()
     {
-        Schema::create('face_records', function (Blueprint $table) {
+        Schema::create('smstempletes', function (Blueprint $table) {
             $table->id();
-            $table->softDeletes();
+            $table->string('name');
+            $table->string('content');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreateFaceRecordsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('face_records');
+        Schema::dropIfExists('smstempletes');
     }
 }

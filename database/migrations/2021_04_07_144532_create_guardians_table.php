@@ -17,7 +17,9 @@ class CreateGuardiansTable extends Migration
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
             $table->foreignId('student_id')->references('id')->on('students');
-            $table->string('phone_number');
+            $table->string('phone');
+            $table->string('fname');
+            $table->string('surname');
             $table->string('should_notify')->default('true');//can receive sms notification
             $table->string('type')->default('guardian');//father,mother,guardian
             $table->softDeletes();

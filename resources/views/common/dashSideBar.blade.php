@@ -14,7 +14,7 @@
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
           {{-- <img src="{{route('default').$user->profile_image}}" class="img-circle elevation-2" alt="@if (Auth::user()){{Auth::user()->name}}@endif"> --}}
-          <img src="{{route('default')}}" class="img-circle elevation-2" alt="@if (Auth::user()){{Auth::user()->name}}@endif">
+          <img src="{{route('default')}}/images/logo.png" class="img-circle elevation-2" alt="@if (Auth::user()){{Auth::user()->name}}@endif">
         </div>
         <div class="info">
           <a href="#" class="d-block">@if (Auth::user())
@@ -52,36 +52,34 @@
           </li>
           <li class="nav-item">
             <a href="{{route('school.parents')}}" class="nav-link  @if(Route::is('school.parents'))active @endif">
-                <i class="fab fa-elementor"></i>
+                <i class="nav-icon fas fa-user-alt"></i>
               <p>
                 Parents
               </p>
             </a>
           </li>
-            <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('school.reports')}}" class="nav-link @if(Route::is('school.reports'))active @endif">
+                <a href="{{route('school.reports',['class'=>'all','stream'=>'all'])}}" class="nav-link @if(Route::is('school.reports'))active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Reports</p>
                 </a>
               </li>
-            </ul>
           </li>
 
           <li class="nav-header">SMS</li>
 
 
           <li class="nav-item">
-            <a href="{{route('school.send.sms')}}" class="nav-link @if(Route::is('school.send.sms'))active @endif">
-                <i class="fas fa-user-shield"></i>              <p>
-                Send Sms
+            <a href="{{route('sms.templete')}}" class="nav-link @if(Route::is('school.send.sms'))active @endif">
+                <i class="fas fa-book"></i>              <p>
+                Templetes
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{route('school.reports.sms')}}" class="nav-link @if(Route::is('school.reports.sms'))active @endif">
-                <i class="fas fa-headset"></i>              <p>
-                Reports
+            <a href="{{route('school.bulkSms',['class'=>'all','stream'=>'all'])}}" class="nav-link @if(Route::is('school.reports.sms'))active @endif">
+                <i class="fas fa-inbox"></i>              <p>
+                Send Bulk
               </p>
             </a>
           </li>
@@ -90,7 +88,7 @@
 
           <li class="nav-item">
             <a href="{{route('school.streams')}}" class="nav-link @if(Route::is('school.streams'))active @endif">
-                <i class="fas fa-headset"></i>              <p>
+                <i class="fas fa-code-branch"></i>             <p>
                 Streams Setup
               </p>
             </a>
