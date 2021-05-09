@@ -6,6 +6,8 @@ use App\Models\DeviceRecord;
 use App\Models\FaceRecord;
 use App\Models\Guardian;
 use App\Models\Smstemplete;
+use App\Models\Staff;
+use App\Models\StaffFaceRecord;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -136,6 +138,63 @@ class DeviceRecordController extends Controller
                     }
 
                     // return back()->with('success', 'Sms sent successfully');
+                }
+            }else{
+                $staff=Staff::where('staff_id','=',$upi_no)->get()->first();
+                if ($staff!=null) {
+                    $faceRecord=new StaffFaceRecord();
+                $faceRecord->reg_no=$upi_no;
+                $faceRecord->time_taken=$time_taken;
+                $faceRecord->device_serial=$device_serial;
+                $faceRecord->staff_type=$staff->type;
+                $faceRecord->event=$event;
+                $faceRecord->temperature=$temperature;
+
+
+
+                    $faceR=StaffFaceRecord::where('reg_no','=',$upi_no)
+                    ->whereDate('created_at', Carbon::today())
+                    ->orderby('id','DESC')
+                    ->first();
+                    // dd($faceR);
+                    if($faceR!=null){
+                        //we have a record
+                        //check if a record is already present within the past 30 minutes
+                        $input=$faceR->time_taken;
+                        $input2=$time_taken;
+                        $input = floor($input /1000 / 60);
+                        $input2 = floor($input2 /1000 / 60);
+                        if($input2-$input<10){
+
+                            // dd('<10');
+                            //recent record taken
+                            //Ignore
+                            // $faceRecord->save();
+                            // $this->sendSms($guardian,$faceRecord,$time_taken,'second');
+                        }else{
+                            //check if its the second record
+
+                            if (sizeof(StaffFaceRecord::where('reg_no', '=', $upi_no)
+                            ->whereDate('created_at', Carbon::today())
+                            ->get()) ==1) {
+                                // dd('second');
+                                $faceRecord->status='exit';
+                                $faceRecord->save();
+                            }else{
+                                // dd(sizeof(FaceRecord::where('upi_no', '=', $upi_no)
+                                // ->whereDate('created_at', Carbon::today())
+                                // ->get()));
+                                $faceRecord->save();
+                            }
+                        }
+
+
+                    }else{
+                        //no record
+                        // dd('first');
+                        $faceRecord->status='enter';
+                        $faceRecord->save();
+                    }
                 }
             }
         }

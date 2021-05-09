@@ -58,13 +58,33 @@
               </p>
             </a>
           </li>
+                  @php
+                      $myDate=date("Y-m-d");
+                  @endphp
               <li class="nav-item">
-                <a href="{{route('school.reports',['class'=>'all','stream'=>'all'])}}" class="nav-link @if(Route::is('school.reports'))active @endif">
+                <a href="{{route('school.detailedReports',['class'=>'all','stream'=>'all','day'=>$myDate])}}" class="nav-link @if(Route::is('school.detailedReports'))active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Reports</p>
                 </a>
               </li>
-          </li>
+
+              <li class="nav-header">Staff Reports</li>
+              <li class="nav-item">
+                <a href="{{route('staff.reports',['type'=>'teaching','day'=>$myDate])}}" class="nav-link">
+                  <i class="nav-icon fas fa-user-alt"></i>
+                  <p>
+                    Teaching
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('staff.reports',['type'=>'non-teaching','day'=>$myDate])}}" class="nav-link  ">
+                    <i class="nav-icon fas fa-user-alt"></i>
+                  <p>
+                    Non-Teaching
+                  </p>
+                </a>
+              </li>
 
           <li class="nav-header">SMS</li>
 

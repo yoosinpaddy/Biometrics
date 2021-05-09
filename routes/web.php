@@ -24,9 +24,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', [StudentController::class, 'home'])->name('school.home');
     Route::get('/parents', [StudentController::class, 'parents'])->name('school.parents');
     Route::get('/reports/{class}/{stream}', [StudentController::class, 'reports'])->name('school.reports');
+    Route::get('/staff/{type}/{day}', [StudentController::class, 'staff'])->name('staff.reports');
+    Route::get('/reports/{class}/{stream}/{day}', [StudentController::class, 'detailedReports'])->name('school.detailedReports');
     Route::get('/bulk_sms/{class}/{stream}', [StudentController::class, 'bulk_sms'])->name('school.bulkSms');
     Route::post('/send_bulk_sms', [StudentController::class, 'send_bulk_sms'])->name('school.send_bulk_sms');
     Route::post('/reports/poster', [StudentController::class, 'reportsPoster'])->name('school.reports.poster');
+    Route::post('/staff/reports/poster/{type}', [StudentController::class, 'staffReportsPoster'])->name('staff.reports.poster');
     Route::post('/students/poster', [StudentController::class, 'studentsPoster'])->name('school.students.poster');
     Route::get('/reports/sms', [StudentController::class, 'reports_sms'])->name('school.reports.sms');
     Route::get('/streams', [StudentController::class, 'streams'])->name('school.streams');
@@ -34,6 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/streams/update', [StudentController::class, 'streamsUpdate'])->name('update.streams');
     Route::get('/class/{class_name}/{stream_id}', [StudentController::class, 'myClass'])->name('school.class.data');
     Route::post('/parents/new', [StudentController::class, 'newParent'])->name('school.new.parent');
+    Route::post('/staff/new', [StudentController::class, 'newStaff'])->name('school.new.staff');
     Route::post('/student/new', [StudentController::class, 'newStudent'])->name('school.new.student');
     Route::post('/student/update', [StudentController::class, 'updateStudent'])->name('school.update.student');
     Route::get('/parents', [StudentController::class, 'getParents'])->name('school.parents');

@@ -65,7 +65,7 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Parents</li>
+                                <li class="breadcrumb-item active">Staff</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -86,11 +86,17 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Register Reports</h3>
                                     <div class="project-actions text-right">
+                                        <a class="btn btn-primary btn-sm" href="#" data-toggle="modal"
+                                            data-target="#modal-addStaff">
+                                            <i class="fas fa-plus">
+                                            </i>
+                                            NEW
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="card-header">
                                     <form id="searchForm"
-                                        action="{{ route('school.reports.poster') }}"
+                                        action="{{ route('staff.reports.poster',['type'=>$type]) }}"
                                         method='POST' enctype="multipart/form-data">
                                         <div class="modal-content">
 
@@ -103,35 +109,7 @@
                                                                     {!! csrf_field() !!}
                                                                     <div class="form-group">
                                                                         <div class="row">
-                                                                            <div class="col-lg-4">
-
-                                                                                <label for="class">Class</label>
-                                                                                <select required="" name="class" id="class"
-                                                                                    class="form-control custom-select">
-                                                                                    <option value="{{$current_class}}">{{$current_class}}</option>
-                                                                                    @foreach ($classes as $class)
-                                                                                        <option value="{{ $class->class }}">
-                                                                                            {{ $class->class  }}
-                                                                                        </option>
-
-                                                                                    @endforeach
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-lg-4">
-
-                                                                                <label for="stream">Stream</label>
-                                                                                <select required="" name="stream" id="stream"
-                                                                                    class="form-control custom-select">
-                                                                                    <option value="{{$current_streamv}}">{{$current_stream}}</option>
-                                                                                    @foreach ($streams as $stream)
-                                                                                        <option value="{{ $stream->id }}">
-                                                                                            {{ $stream->name  }}
-                                                                                        </option>
-
-                                                                                    @endforeach
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="col-lg-4  mx-auto">
+                                                                            <div class="col-lg-12  mx-auto">
                                                                                 <label for="stream">Date</label>
                                                                                 <div class="form-group mb-4">
                                                                                     <div class="datepicker date input-group p-0 shadow-sm">
@@ -181,23 +159,23 @@
                                     <table id="example1" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>UPI</th>
+                                                <th>Staff No</th>
                                                 <th>Name</th>
                                                 <th>Temperature</th>
                                                 <th>Time(Arrival)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @if (sizeof($myRecords) == 0)
+                                            @if (sizeof($staffRecords) == 0)
                                                 <td></td>
                                                 <td>No Reports added yet</td>
                                             @endif
-                                            @foreach ($myRecords as $item)
+                                            @foreach ($staffRecords as $item)
                                                 <tr>
-                                                    <td>{{ $item->upi_no }}</td>
+                                                    <td>{{ $item->reg_no }}</td>
 
                                                     <td>
-                                                        {{ $item->student->first_name . ' ' . $item->student->surname }}
+                                                        {{ $item->staff->fname.' '.$item->staff->surname}}
                                                     </td>
                                                     <td>
                                                         {{ $item->temperature }}
@@ -218,14 +196,14 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th>UPI</th>
+                                                <th>Staff No</th>
                                                 <th>Name</th>
                                                 <th>Temperature</th>
                                                 <th>Time(Arrival)</th>
                                             </tr>
                                         </tfoot>
                                     </table>
-                                    <div class="row">{{ $myRecords->links('pagination::bootstrap-4') }}</div>
+                                    <div class="row">{{ $staffRecords->links('pagination::bootstrap-4') }}</div>
 
                                 </div>
                                 <!-- /.card-body -->
@@ -238,16 +216,16 @@
                     <!-- /.row (main row) -->
                 </div><!-- /.container-fluid -->
 
-                <div class="modal fade" id="modal-addParent">
+                <div class="modal fade" id="modal-addStaff">
                     <div class="modal-dialog modal-xl">
-                        <form id="newParentForm" action="{{ route('school.new.parent') }}" method='POST'
+                        <form id="newStaffForm" action="{{ route('school.new.staff') }}" method='POST'
                             enctype="multipart/form-data">
                             <div class="modal-content">
                                 <div id="progressBar" class=" d-flex justify-content-center align-items-center">
 
                                 </div>
                                 <div class="modal-header">
-                                    <h4 class="modal-title">New Parent</h4>
+                                    <h4 class="modal-title">New Staff</h4>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -280,47 +258,39 @@
                                                         @endif
                                                         {!! csrf_field() !!}
                                                         <div class="form-group">
-                                                            <label for="fname">Guardian first name</label>
+                                                            <label for="fname">Staff first name</label>
                                                             <input required="" type="text" name="fname"
                                                                 placeholder="First name" id="fname" class="form-control"
                                                                 value="">
                                                             <input id="newOrderId" type="hidden" name="newOrderId"
-                                                                placeholder="Guardian first name" class="form-control"
+                                                                placeholder="Staff first name" class="form-control"
                                                                 value="">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="surname">Guardian Surname</label>
+                                                            <label for="surname">Staff Surname</label>
                                                             <input required="" type="text" name="surname"
-                                                                placeholder="Guardian Surname" id="surname"
+                                                                placeholder="Staff Surname" id="surname"
                                                                 class="form-control" value="">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="phone">Guardian Phone</label>
+                                                            <label for="surname">Staff Reg. Id</label>
+                                                            <input required="" type="text" name="staff_id"
+                                                                placeholder="Staff Id" id="surname"
+                                                                class="form-control" value="">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="phone">Staff Phone</label>
                                                             <input required="" type="text" name="phone"
-                                                                placeholder="Guardian Phone" id="phone"
+                                                                placeholder="Staff Phone" id="phone"
                                                                 class="form-control" value="">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="student_id">Student</label>
-                                                            <select required="" name="student_id" id="student_id"
-                                                                class="form-control custom-select">
-                                                                <option value="">Select One</option>
-                                                                @foreach ($allStudents as $student)
-                                                                    <option value="{{ $student->id }}">
-                                                                        {{ $student->first_name . ' ' . $student->surname . ' (' . $student->class . '-' . $student->getStream->name . ')' }}
-                                                                    </option>
-
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="inputStatus3">Relationship with student </label>
+                                                            <label for="inputStatus3">Staff Type</label>
                                                             <select required="" name="type" id="inputStatus"
                                                                 class="form-control custom-select">
                                                                 <option value="">Select one</option>
-                                                                <option value="father">Father</option>
-                                                                <option value="mother">Mother</option>
-                                                                <option value="guardian">Guardian</option>
+                                                                <option value="teaching">Teaching</option>
+                                                                <option value="non-teaching">Non-Teaching</option>
                                                             </select>
                                                         </div>
 

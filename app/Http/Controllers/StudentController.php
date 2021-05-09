@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\FaceRecord;
 use App\Models\Guardian;
 use App\Models\Smstemplete;
+use App\Models\Staff;
+use App\Models\StaffFaceRecord;
 use App\Models\Stream;
 use App\Models\Student;
 use App\Models\User;
@@ -203,6 +205,43 @@ class StudentController extends Controller
             'message' => 'Something went wrong, contact system administrator',
         ]);
     }
+    public function newStaff(Request $request)
+    {
+        $validate = $request->validate([
+            'staff_id' => ['required', 'max:255'],
+            'phone' => ['required', 'max:255'],
+            'fname' => ['required', 'max:255'],
+            'surname' => ['required', 'max:255'],
+            'type' => ['required', 'max:255'], //teaching non-teaching
+        ]);
+
+
+        $user = new User();
+        if (sizeof(User::where('phone', '=', $request->phone_number)->get()) > 0) {
+            $user = User::where('phone', '=', $request->phone_number)->limit(1)->get()->first();
+        }
+        $user->name = $request->fname . ' ' . $request->surname;
+        $user->phone = $request->phone;
+        $user->save();
+        // dd($user->id);
+        $staff = new Staff();
+        $staff->user_id = $user->id;
+        $staff->staff_id = $request->staff_id;
+        $staff->phone = $request->phone;
+        $staff->fname = $request->fname;
+        $staff->surname = $request->surname;
+        $staff->type = $request->type;
+        if (sizeof(Guardian::where('student_id', '=', $request->student_id)->where('phone', '=', $request->phone)->get()) > 0) {
+            return back()->with('success', 'staff added successfully');
+        }
+        if ($staff->save()) {
+            return back()->with('success', 'staff added successfully');
+        }
+
+        return back()->withErrors([
+            'message' => 'Something went wrong, contact system administrator',
+        ]);
+    }
 
     public function newStudent(Request $request)
     {
@@ -283,8 +322,16 @@ class StudentController extends Controller
         $validate = $request->validate([
             'class' => ['required', 'max:255'],
             'stream' => ['required', 'max:255'],
+            'day' => ['required', 'max:255'],
         ]);
-        return redirect()->route('school.reports', ['class' => $request->class, 'stream' => $request->stream]);
+        return redirect()->route('school.detailedReports', ['class' => $request->class, 'stream' => $request->stream,'day'=>$request->day]);
+    }
+    public function staffReportsPoster(Request $request)
+    {
+        $validate = $request->validate([
+            'day' => ['required', 'max:255'],
+        ]);
+        return redirect()->route('staff.reports', ['day'=>$request->day,'type'=>$request->type]);
     }
 
     public function streams(Request $request)
@@ -362,6 +409,36 @@ if($templetes->save()){
 }
         return view('school.templete', ['templetes' => $templetes]);
     }
+    public function staff(Request $request)
+    {
+        $staffRecords = array();
+        $day = $request->day;
+        $myvar = strtotime($day) * 1000;
+        $myvar2 = strtotime('+24 hours', strtotime($day)) * 1000;
+
+        $title = '';
+        if($request->type=='teaching'){
+            $title = 'Teaching';
+            $staffRecords = StaffFaceRecord::where('staff_face_records.status','=','enter')->where('time_taken','>',$myvar)
+            ->where('time_taken','<',$myvar2)
+            ->where('staff_type','=','teaching')
+            ->orderBy('staff_face_records.created_at', 'ASC')->paginate(300);
+        }else{
+            $title = 'Teaching';
+            $staffRecords = StaffFaceRecord::where('staff_face_records.status','=','enter')->where('time_taken','>',$myvar)
+            ->where('time_taken','<',$myvar2)
+            ->where('staff_type','!=','teaching')
+            ->orderBy('staff_face_records.created_at', 'ASC')->paginate(300);
+
+        }
+
+        return view('staff.reports', [ 'staffRecords' => $staffRecords,
+             'title' => $title,
+             'type' => $request->type,
+            'day' => $day,
+        ]);
+
+    }
     public function reports(Request $request)
     {
 
@@ -431,6 +508,82 @@ if($templetes->save()){
             'current_class' => $current_class,
             'current_stream' => $current_stream,
             'current_streamv' => $current_streamv,
+        ]);
+    }
+    public function detailedReports(Request $request)
+    {
+
+        $classes = Student::select('class')->where('class', '!=', '9')->groupBy('class')->get();
+        $streams = Stream::all();
+
+
+        $allStudents = array();
+        $title = '';
+        $current_class = 'all';
+        $current_stream = 'all';
+        $current_streamv = 'all';
+        $day = $request->day;
+        $myvar = strtotime($day) * 1000;
+        $myvar2 = strtotime('+24 hours', strtotime($day)) * 1000;
+        $key1 = 2;
+        $myRecords = array();
+        // dd(sizeof($myRecords));
+        // dd($myRecords);
+        if ($request->class != 'all') {
+            $current_class = $request->class;
+            if ($request->stream != 'all') {
+                $stream_name = Stream::where('id', '=', $request->stream)->get();
+                $title = 'Class ' . $request->class . '-' . $stream_name[0]->name;
+                $current_stream = $stream_name[0]->name;
+                $current_streamv = $request->stream;
+                $allStudents = Student::where('class', '=', $request->class)->where('stream', '=', $request->stream)->paginate(300);
+
+                $myRecords = FaceRecord::join('students', function ($join) {
+                        $join->on('students.upi_no', '=', 'face_records.upi_no');
+                    })->where('time_taken','>',$myvar)
+                    ->where('time_taken','<',$myvar2)
+                    ->where('students.class', '=', $request->class)->where('face_records.status','=','enter')->where('students.stream', '=', $request->stream)->orderBy('face_records.created_at', 'ASC')->paginate(300);
+            } else {
+                $title = 'Class ' . $request->class;
+                $allStudents = Student::where('class', '=', $request->class)->paginate(300);
+                $myRecords = FaceRecord::join('students', function ($join) {
+                        $join->on('students.upi_no', '=', 'face_records.upi_no');
+                    })->where('time_taken','>',$myvar)
+                    ->where('time_taken','<',$myvar2)
+                    ->where('face_records.status','=','enter')->where('students.class', '=', $request->class)->orderBy('face_records.created_at', 'ASC')->paginate(300);
+            }
+        } else {
+            if ($request->stream != 'all') {
+                $stream_name = Stream::where('id', '=', $request->stream)->get();
+                $title = 'All Classes of Stream ' . $stream_name[0]->name;
+                // dd($stream_name[0]->name);
+                $current_stream = $stream_name[0]->name;
+                $current_streamv = $request->stream;
+                $allStudents = Student::where('stream', '=', $request->stream)->paginate(300);
+                $myRecords = FaceRecord::join('students', function ($join) {
+                        $join->on('students.upi_no', '=', 'face_records.upi_no');
+                    })->where('time_taken','>',$myvar)
+                    ->where('time_taken','<',$myvar2)
+                    ->where('face_records.status','=','enter')->where('students.stream', '=', $request->stream)->orderBy('face_records.created_at', 'ASC')->paginate(300);
+            } else {
+                $title = 'All Classes in all Streams';
+                $allStudents = Student::paginate(300);
+                $myRecords = FaceRecord::where('face_records.status','=','enter')->where('time_taken','>',$myvar)
+                ->where('time_taken','<',$myvar2)
+                ->orderBy('face_records.created_at', 'ASC')->paginate(300);
+            }
+        }
+        // dd($myRecords[0]->student);
+        $parents = Guardian::paginate(100);
+        //    dd($parents[0]->student);
+        return view('school.reports', [
+            'parents' => $parents, 'allStudents' => $allStudents,
+            'classes' => $classes, 'streams' => $streams, 'title' => $title,
+            'myRecords' => $myRecords,
+            'current_class' => $current_class,
+            'current_stream' => $current_stream,
+            'current_streamv' => $current_streamv,
+            'day' => $day,
         ]);
     }
     public function send_bulk_sms(Request $request)
